@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { Maximize, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { offerConfig } from "@/config/offer";
-import { formatTime } from "@/lib/format";
 import { LogoMark } from "@/components/brand/Logo";
 
 type Status = "idle" | "playing" | "paused" | "ended";
@@ -37,7 +36,6 @@ export function VideoPlayer({ onFrame, onEnded, onPlayingChange }: Props) {
   const [muted, setMuted] = useState(false);
   const [demo, setDemo] = useState(false);
   const [posterLoaded, setPosterLoaded] = useState(false);
-  const [time, setTime] = useState({ current: 0, duration: 0 });
 
   const demoDuration = offerConfig.unlock.demoDurationSeconds;
 
@@ -54,9 +52,6 @@ export function VideoPlayer({ onFrame, onEnded, onPlayingChange }: Props) {
   const emit = useCallback(() => {
     const f = readFrame();
     onFrame(f);
-    setTime((prev) =>
-      Math.floor(prev.current) !== Math.floor(f.current) || prev.duration !== f.duration ? f : prev,
-    );
     return f;
   }, [onFrame, readFrame]);
 
@@ -133,10 +128,7 @@ export function VideoPlayer({ onFrame, onEnded, onPlayingChange }: Props) {
       onEnded();
     };
     const onSeeked = () => emit();
-    const onError = () => {
-      setDemo(true);
-      setTime({ current: 0, duration: demoDuration });
-    };
+    const onError = () => setDemo(true);
 
     // O vídeo pode ter carregado (ou falhado) antes da hidratação.
     if (v.error) onError();
@@ -319,9 +311,6 @@ export function VideoPlayer({ onFrame, onEnded, onPlayingChange }: Props) {
           <ControlButton label={muted ? "Ativar som" : "Silenciar"} onClick={toggleMute}>
             {muted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
           </ControlButton>
-          <span className="ml-1 font-mono text-xs tabular-nums text-ice/85 sm:text-sm" aria-live="off">
-            {formatTime(time.current)} <span className="text-sage">/ {formatTime(time.duration)}</span>
-          </span>
           <span className="flex-1" />
           {demo && (
             <span className="mr-1 hidden rounded-full border border-lime/40 px-2 py-0.5 text-[0.65rem] uppercase tracking-wider text-lime sm:inline">
