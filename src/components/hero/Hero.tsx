@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Lock, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { heroContent, offerContent } from "@/config/content";
-import { offerConfig } from "@/config/offer";
+import { displayProgress, offerConfig } from "@/config/offer";
 import { useUnlock } from "@/components/providers/UnlockProvider";
 import { Logo } from "@/components/brand/Logo";
 import { Eyebrow } from "@/components/ui/SectionHeading";
@@ -45,9 +45,9 @@ export function Hero() {
   const onFrame = useCallback(
     ({ current, duration }: PlayerFrame) => {
       if (duration <= 0) return;
-      barRef.current?.set(current / duration);
+      barRef.current?.set(displayProgress(current / duration));
 
-      const ratio = Math.min(1, UNLOCK_AT / duration);
+      const ratio = displayProgress(Math.min(1, UNLOCK_AT / duration));
       setMarkerRatio((prev) => (prev === ratio ? prev : ratio));
 
       if (duration < UNLOCK_AT && !warnedRef.current) {

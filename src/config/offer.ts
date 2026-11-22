@@ -62,3 +62,19 @@ export const offerConfig = {
 } as const;
 
 export type OfferConfig = typeof offerConfig;
+
+/**
+ * Curva da barra verde. A barra segue o tempo do vídeo, mas anda rápido no
+ * começo e vai desacelerando. Quanto MENOR o número, mais rápida no início:
+ *   1    = linear (progresso real)
+ *   0.5  = 10% do vídeo → 32% da barra · 50% → 71%
+ *   0.4  = 10% do vídeo → 40% da barra · 50% → 76%
+ *   0.3  = 10% do vídeo → 50% da barra · 50% → 81%
+ */
+export const progressCurve = 0.4;
+
+/** Converte o progresso real (0–1) na posição exibida da barra (0–1). */
+export function displayProgress(realRatio: number): number {
+  const r = Math.max(0, Math.min(1, realRatio));
+  return Math.pow(r, progressCurve);
+}
