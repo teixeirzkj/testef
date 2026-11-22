@@ -31,6 +31,7 @@ export function VideoPlayer({ onFrame, onEnded, onPlayingChange }: Props) {
   const rafRef = useRef<number>(0);
   const demoTimeRef = useRef(0);
   const lastTickRef = useRef(0);
+  const resumeDoneRef = useRef(false);
 
   const [status, setStatus] = useState<Status>("idle");
   const [muted, setMuted] = useState(false);
@@ -102,11 +103,17 @@ export function VideoPlayer({ onFrame, onEnded, onPlayingChange }: Props) {
     const v = videoRef.current;
     if (!v || demo) return;
     const onMeta = () => {
-      try {
-        const saved = Number(window.localStorage.getItem(RESUME_KEY));
-        if (saved > 1 && saved < v.duration - 2) v.currentTime = saved;
-      } catch {
-        /* ignore */
+      // Retoma a posição salva UMA única vez por carregamento da página.
+      // (Este efeito pode rodar de novo, por exemplo na liberação da oferta, e
+      // não pode fazer o vídeo voltar no tempo.)
+      if (!resumeDoneRef.current) {
+        resumeDoneRef.current = true;
+        try {
+          const saved = Number(window.localStorage.getItem(RESUME_KEY));
+          if (saved > 1 && saved < v.duration - 2 && v.currentTime < 1) v.currentTime = saved;
+        } catch {
+          /* ignore */
+        }
       }
       emit();
     };

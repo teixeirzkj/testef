@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { Lock, Sparkles } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { heroContent, offerContent } from "@/config/content";
 import { offerConfig } from "@/config/offer";
 import { useUnlock } from "@/components/providers/UnlockProvider";
@@ -28,13 +28,19 @@ export function Hero() {
   const warnedRef = useRef(false);
 
   /** Dispara a liberação UMA vez; o vídeo segue tocando normalmente. */
+  // Referência estável (não depende de `unlocked`) para não re-registrar os eventos do vídeo.
   const doUnlock = useCallback(() => {
-    if (firedRef.current || unlocked) return;
+    if (firedRef.current) return;
     firedRef.current = true;
     setSweep(true);
     setJustUnlocked(true);
     unlock();
-  }, [unlock, unlocked]);
+  }, [unlock]);
+
+  // Visitante que já liberou nesta sessão: não repete a animação.
+  useEffect(() => {
+    if (unlocked) firedRef.current = true;
+  }, [unlocked]);
 
   const onFrame = useCallback(
     ({ current, duration }: PlayerFrame) => {
