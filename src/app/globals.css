@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/* ============ Design tokens ============ */
+@theme {
+  --color-obsidian: #081316;
+  --color-obsidian-2: #0b1b1e;
+  --color-carbon: #152a2b;
+  --color-carbon-2: #1c3536;
+  --color-mint: #19f5a5;
+  --color-lime: #c5ff58;
+  --color-ice: #f5faf8;
+  --color-sage: #91aaa5;
+  --color-petrol: #06232a;
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-aurora: aurora 18s ease-in-out infinite alternate;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-sheen: sheen 3.2s ease-in-out infinite;
+
+  @keyframes aurora {
+    0% { transform: translate3d(-6%, -4%, 0) scale(1); }
+    50% { transform: translate3d(5%, 3%, 0) scale(1.08); }
+    100% { transform: translate3d(-2%, 6%, 0) scale(0.96); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -12px, 0); }
+  }
+  @keyframes sheen {
+    0% { transform: translateX(-120%) skewX(-20deg); }
+    60%, 100% { transform: translateX(220%) skewX(-20deg); }
+  }
+}
+
+:root {
+  color-scheme: dark;
+  --glow-mint: 0 0 0 1px rgb(25 245 165 / 0.35), 0 10px 40px -8px rgb(25 245 165 / 0.55);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-obsidian);
+  color: var(--color-ice);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(25 245 165 / 0.3);
+  color: var(--color-ice);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-mint);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ============ Utilities ============ */
+@utility container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+@utility text-gradient {
+  background: linear-gradient(100deg, var(--color-mint) 10%, var(--color-lime) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass {
+  background: linear-gradient(160deg, rgb(28 53 54 / 0.72), rgb(12 28 30 / 0.6));
+  border: 1px solid rgb(145 170 165 / 0.14);
+  box-shadow: inset 0 1px 0 rgb(245 250 248 / 0.06), 0 30px 60px -30px rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@utility tech-grid {
+  background-image:
+    linear-gradient(rgb(145 170 165 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(145 170 165 / 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+}
+
+@utility noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+}
+
+/* Borda luminosa que acompanha o cursor (definida por --mx / --my) */
+@utility spotlight-border {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      380px circle at var(--mx, 50%) var(--my, 0%),
+      rgb(25 245 165 / 0.75),
+      rgb(197 255 88 / 0.2) 35%,
+      transparent 60%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-premium);
+    pointer-events: none;
+    z-index: 1;
+  }
+  &:hover::before,
+  &:focus-within::before,
+  &[data-active="true"]::before {
+    opacity: 1;
+  }
+}
+
+/* ============ Reduced motion ============ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
